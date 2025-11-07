@@ -63,8 +63,8 @@ public abstract class Persona {
 
 
     ///  metodos
-    public String obtenerNombreCompleto() {
-            return  nombre+" "+apellido;
+    public String getNombreCompleto() {
+        return (nombre == null ? "" : nombre) + " " + (apellido == null ? "" : apellido);
     }
 
     /// MOSTRAR
