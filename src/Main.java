@@ -14,7 +14,7 @@ public class Main {
             // 2. Creamos la consola y le pasamos el sistema.
             Consola consola = new Consola(sistema);
 
-            // 3. Iniciamos la consola. Ahora la llamada está DENTRO del try.
+            // 3. Iniciamos la consola.
             consola.iniciar();
 
         } catch (JSONException e) {
