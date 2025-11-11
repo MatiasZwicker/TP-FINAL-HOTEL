@@ -11,6 +11,7 @@ public class Reserva {
     private LocalDate hasta;
     private UUID habitacionId;
     private boolean cancelada;
+    private Pago pago;
 
     public Reserva() { this.id = UUID.randomUUID(); }
 
@@ -22,6 +23,7 @@ public class Reserva {
         this.hasta = hasta;
         this.habitacionId = habitacionId;
         this.cancelada = false;
+
     }
 
     public boolean seSolapa(LocalDate desdeNuevo, LocalDate hastaNuevo) {
@@ -31,6 +33,14 @@ public class Reserva {
     }
 
     // getters/setters...
+
+    public Pago getPago() {
+        return pago;
+    }
+
+    public void setPago(Pago pago) {
+        this.pago = pago;
+    }
 
     public UUID getId() {
         return id;

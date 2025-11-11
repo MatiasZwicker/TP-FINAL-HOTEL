@@ -3,6 +3,7 @@ package manejoJSON;
 import Clases.*;
 import Clases.Cocina.*;
 import Controladores.Sistema;
+import Enums.MetodoPago;
 import Enums.Rol;
 import Interfaz.ItemCocina;
 import org.json.JSONArray;
@@ -12,10 +13,8 @@ import org.json.JSONObject;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 public class Consola {
 
@@ -463,8 +462,13 @@ public class Consola {
         );
 
         // Guardar en el sistema y en JSON
-        sistema.agregarReserva(nuevaReserva);
-        ManejoJSONReserva.guardar(nuevaReserva);
+        if (confirmarReserva(nuevaReserva)) {
+            sistema.agregarReserva(nuevaReserva);
+            ManejoJSONReserva.guardar(nuevaReserva);
+            System.out.println("✅ Reserva confirmada y guardada correctamente.");
+        } else {
+            System.out.println("❌ La reserva fue cancelada o no se confirmó el pago.");
+        }
 
         // También actualizar la habitación en JSON agregando el ID de la reserva
         ManejoJSONHabitacion.agregarReservaIdEnJSON(habitacion, nuevaReserva.getId());
@@ -495,6 +499,49 @@ public class Consola {
                             " | Hasta: " + r.getHasta()
             );
         }
+    }
+
+    private boolean confirmarReserva(Reserva reserva) {
+        System.out.println("\n--- Confirmar Reserva ---");
+        System.out.println("Cliente: " + reserva.getDocumento());
+        System.out.println("Habitación ID: " + reserva.getHabitacionId());
+        System.out.println("Desde: " + reserva.getDesde());
+        System.out.println("Hasta: " + reserva.getHasta());
+
+        long noches = ChronoUnit.DAYS.between(reserva.getDesde(), reserva.getHasta());
+        double precioPorNoche = sistema.buscarHabitacionPorId(reserva.getHabitacionId()).get().getPrecioxNoche();
+        double total = noches * precioPorNoche;
+
+
+        double monto1 = calcularMontoReserva(reserva);
+        System.out.println("Total a pagar: " + monto1);
+
+        System.out.println("\nSeleccione método de pago:");
+        System.out.println("1 - Efectivo");
+        System.out.println("2 - Tarjeta Credito");
+        System.out.println("3 - Tarjeta Debito");
+        System.out.println("4 - Transferencia");
+
+        int opcion = leerEntero("Opción: ");
+        MetodoPago metodo;
+
+        switch (opcion) {
+            case 1 -> metodo = MetodoPago.EFECTIVO;
+            case 2 -> metodo = MetodoPago.TARJETA_CREDITO;
+            case 3->  metodo = MetodoPago.TARJETA_DEBITO;
+            case 4 -> metodo = MetodoPago.TRANSFERENCIA;
+            default -> {
+                System.out.println("❌ Método inválido. Reserva no confirmada.");
+                return false;
+            }
+        }
+
+
+        Pago pago = new Pago(monto1, metodo, "SIM-" + UUID.randomUUID());
+        reserva.setPago(pago); // si tu clase Reserva tiene un campo Pago
+        System.out.println("✅ Pago registrado: " + monto1 + " vía " + metodo);
+
+        return true;
     }
 
     // ================= MOSTRAR DATOS =================
@@ -645,6 +692,26 @@ public class Consola {
         menu.forEach(p -> System.out.println("🍽️ | " + p.getNombre() + " - $" + p.getPrecio()));
     }
 
+    private double calcularMontoReserva(Reserva reserva) {
+        Optional<Habitacion> habitacion = sistema.buscarHabitacionPorId(reserva.getHabitacionId());
+
+        if (habitacion == null) {
+            System.out.println("⚠️ No se encontró la habitación.");
+            return 0;
+        }
+
+        long noches = ChronoUnit.DAYS.between(reserva.getDesde(), reserva.getHasta());
+        if (noches <= 0) noches = 1; // al menos una noche
+
+        double total = habitacion.get().getPrecioxNoche() * noches;
+
+        System.out.println("🏨 Habitacion: " + habitacion.get().getNumero());
+        System.out.println("🛏️ Precio por noche: $" + habitacion.get().getPrecioxNoche());
+        System.out.println("📅 Noches: " + noches);
+        System.out.println("💰 Total a pagar: $" + total);
+
+        return total;
+    }
 
 
 

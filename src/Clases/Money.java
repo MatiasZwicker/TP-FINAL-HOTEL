@@ -5,7 +5,7 @@ public class Money {
 private BigDecimal monto;
     private String moneda;
 
-    public Money() { this.monto = BigDecimal.ZERO; this.moneda = "ARS"; }
+    public Money(double monto, String ars) { this.monto = BigDecimal.ZERO; this.moneda = "ARS"; }
     public Money(BigDecimal monto, String moneda) { this.monto = monto; this.moneda = moneda; }
 
     public BigDecimal getMonto() { return monto; }

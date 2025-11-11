@@ -2,7 +2,6 @@ package Clases;
 
 import Enums.MetodoPago;
 
-import java.lang.reflect.Member;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -13,7 +12,7 @@ public class Pago {
     private MetodoPago metodo;
     private String referenciaExterna;
 
-    public Pago() { this.id = UUID.randomUUID(); this.fecha = LocalDateTime.now(); }
+    public Pago(double monto1, MetodoPago metodo, String referenciaExterna) { this.id = UUID.randomUUID(); this.fecha = LocalDateTime.now(); }
 
     public Pago(Money monto, MetodoPago metodo, String referenciaExterna) {
         this.id = UUID.randomUUID();
