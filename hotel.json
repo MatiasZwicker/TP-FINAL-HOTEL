@@ -50,6 +50,16 @@
             "email": "MATIZWICKER@GMAIL.COM",
             "dni": 45543410,
             "nacionalidad": "ARGENTINA"
+        },
+        {
+            "apellido": "Iriarte",
+            "id": "9528dfaa-3be1-4590-bb2b-0ba59d1cd115",
+            "telefono": "2236667111",
+            "nombre": "Lucas",
+            "esFrecuente": false,
+            "email": "lucas@gmail.com",
+            "dni": 44111888,
+            "nacionalidad": "Argentino"
         }
     ],
     "usuarios": []
