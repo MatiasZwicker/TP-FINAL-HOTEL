@@ -18,6 +18,8 @@ public class Sistema {
     private List<Usuario> usuarios;
     private List<Habitacion> habitaciones;
     private List<Reserva> reservas;
+    private List<ServicioExtra> servicios;
+    private List<Factura> facturas;
 
     private static final String ARCHIVO_DATOS = "hotel.json";
 
@@ -27,6 +29,8 @@ public class Sistema {
         this.usuarios = new ArrayList<>();
         this.habitaciones = new ArrayList<>();
         this.reservas = new ArrayList<>();
+        this.servicios = new ArrayList<>();
+        this.facturas = new ArrayList<>();
     }
 
     public void cargarSistema() throws JSONException {
@@ -62,6 +66,18 @@ public class Sistema {
                 this.reservas.add(ManejoJSONReserva.fromJSON(reservasJson.getJSONObject(i)));
             }
         }
+        if (data.has("servicios")) {
+            JSONArray serviciosJson = data.getJSONArray("servicios");
+            for (int i = 0; i < serviciosJson.length(); i++) {
+                this.servicios.add(ManejoJSONServicioExtra.fromJSON(serviciosJson.getJSONObject(i)));
+            }
+        }
+        if (data.has("facturas")) {
+            JSONArray facturasJson = data.getJSONArray("facturas");
+            for (int i = 0; i < facturasJson.length(); i++) {
+                this.facturas.add(ManejoJSONFactura.fromJSON(facturasJson.getJSONObject(i)));
+            }
+        }
 
         if (data.has("habitaciones")) {
             JSONArray habitacionesJson = data.getJSONArray("habitaciones");
@@ -81,6 +97,8 @@ public class Sistema {
                 }
             }
         }
+        // aca, en el futuro, iría la vinculación de Estadia con sus servicios, pagos y factura.
+
         System.out.println("✅ Sistema cargado correctamente desde " + ARCHIVO_DATOS);
     }
 
@@ -116,6 +134,20 @@ public class Sistema {
             reservasJson.put(ManejoJSONReserva.toJSON(reserva));
         }
         data.put("reservas", reservasJson);
+
+        //convertir lista de servicios a JsonArray
+        JSONArray serviciosJson = new JSONArray();
+        for (ServicioExtra servicioExtra : this.servicios) {
+            serviciosJson.put(ManejoJSONServicioExtra.toJSON(servicioExtra));
+        }
+        data.put("servicios", serviciosJson);
+
+        //factura
+        JSONArray facturasJson = new JSONArray();
+        for (Factura factura : this.facturas) {
+            facturasJson.put(ManejoJSONFactura.toJSON(factura));
+        }
+        data.put("facturas", facturasJson);
 
         JSONUtiles.grabarObjeto(data, ARCHIVO_DATOS);
         System.out.println("💾 Sistema guardado correctamente en " + ARCHIVO_DATOS);
