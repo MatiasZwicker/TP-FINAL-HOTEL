@@ -18,5 +18,10 @@
         "precio": 250,
         "tipo": "Postre",
         "nombre": "Flan"
+    },
+    {
+        "precio": 200,
+        "tipo": "Postre",
+        "nombre": "Helado"
     }
 ]

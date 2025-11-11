@@ -12,7 +12,10 @@
             "tipo": "doble",
             "numero": 315,
             "precio por noche": 700,
-            "reservasIds": ["94d21b51-0e3c-44bf-b2bd-75d8ea4c6992"],
+            "reservasIds": [
+                "94d21b51-0e3c-44bf-b2bd-75d8ea4c6992",
+                "0f9a8b4a-aa86-4fcc-a26f-42392534aa65"
+            ],
             "id": "46de8050-4c6f-407c-9f01-a1cb25ef2a7f",
             "disponible": true
         },
@@ -23,7 +26,8 @@
             "reservasIds": [
                 "e836e796-724b-4521-8035-cb192a0ebbc8",
                 "a59f05ad-0fdc-4440-8a68-97e4ef395a33",
-                "76c34fca-51e0-4039-9714-1fb84e251edc"
+                "76c34fca-51e0-4039-9714-1fb84e251edc",
+                "79a82707-860e-4ccc-af75-2cbe8d901d18"
             ],
             "id": "11cf0e4b-4162-4eb4-aa68-d461b37cf2f0",
             "disponible": true
@@ -34,58 +38,22 @@
             "precio por noche": 150,
             "reservasIds": [
                 "bc74cd65-dabe-4efe-8a70-3ac2f6bb910b",
-                "08e002b4-1619-473c-9bcd-4545665ac5d7"
+                "08e002b4-1619-473c-9bcd-4545665ac5d7",
+                "c7c4d5c3-7e18-474a-9a56-be0b010103e7"
             ],
             "id": "1e300228-d33f-4079-9649-fd97417eb0ab",
+            "disponible": true
+        },
+        {
+            "tipo": "simple",
+            "numero": 15,
+            "precio por noche": 500,
+            "reservasIds": [],
+            "id": "40c2376b-004d-442a-936e-686487b4dc6e",
             "disponible": true
         }
     ],
     "reservas": [
-        {
-            "hasta": "2025-12-11",
-            "cancelada": false,
-            "desde": "2025-11-11",
-            "nombreReservante": "matias zwicker",
-            "documento": "45543410",
-            "id": "03ed4c23-c9a6-496d-aad0-7e22dd2eca87",
-            "habitacionId": "46de8050-4c6f-407c-9f01-a1cb25ef2a7f"
-        },
-        {
-            "hasta": "2026-01-01",
-            "cancelada": false,
-            "desde": "2025-11-15",
-            "nombreReservante": "matias zwicker",
-            "documento": "45543410",
-            "id": "36f80212-7348-405f-9358-168f1859f41c",
-            "habitacionId": "46de8050-4c6f-407c-9f01-a1cb25ef2a7f"
-        },
-        {
-            "hasta": "2025-12-12",
-            "cancelada": false,
-            "desde": "2025-11-11",
-            "nombreReservante": "matias zwicker",
-            "documento": "45543410",
-            "id": "ceb8007c-5177-41f2-8457-d444f3e444aa",
-            "habitacionId": "46de8050-4c6f-407c-9f01-a1cb25ef2a7f"
-        },
-        {
-            "hasta": "2025-12-12",
-            "cancelada": false,
-            "desde": "2025-11-11",
-            "nombreReservante": "matias zwicker",
-            "documento": "45543410",
-            "id": "85ac1391-5eeb-45be-8a9e-9701b43f32bb",
-            "habitacionId": "46de8050-4c6f-407c-9f01-a1cb25ef2a7f"
-        },
-        {
-            "hasta": "2026-02-02",
-            "cancelada": false,
-            "desde": "2025-12-21",
-            "nombreReservante": "matias zwicker",
-            "documento": "45543410",
-            "id": "bc74cd65-dabe-4efe-8a70-3ac2f6bb910b",
-            "habitacionId": "1e300228-d33f-4079-9649-fd97417eb0ab"
-        },
         {
             "hasta": "2025-10-10",
             "cancelada": false,
@@ -139,6 +107,24 @@
             "documento": "45543410",
             "id": "cfdb25d0-e0b8-4287-b41a-a6ea033b4f24",
             "habitacionId": "7fdd548a-8dcd-4c1b-b0be-264fbcc2bb22"
+        },
+        {
+            "hasta": "2025-12-01",
+            "cancelada": false,
+            "desde": "2025-11-11",
+            "nombreReservante": "lucas iriarte",
+            "documento": "44555999",
+            "id": "79a82707-860e-4ccc-af75-2cbe8d901d18",
+            "habitacionId": "11cf0e4b-4162-4eb4-aa68-d461b37cf2f0"
+        },
+        {
+            "hasta": "2026-02-01",
+            "cancelada": false,
+            "desde": "2026-01-01",
+            "nombreReservante": "FACU fernandez",
+            "documento": "44856348",
+            "id": "0f9a8b4a-aa86-4fcc-a26f-42392534aa65",
+            "habitacionId": "46de8050-4c6f-407c-9f01-a1cb25ef2a7f"
         }
     ],
     "empleados": [
@@ -177,16 +163,83 @@
             "nombre": "juan",
             "email": "juan@gmail.com",
             "dni": 455414
+        },
+        {
+            "apellido": "iriarte",
+            "id": "74d049b9-7d55-4964-b584-a1196e493f64",
+            "telefono": "2236947788",
+            "cargo": "ADMIN",
+            "nombre": "lucas",
+            "email": "lucas@gmail.com",
+            "dni": 44111999
+        },
+        {
+            "apellido": "iriarte",
+            "id": "8785333b-f026-42cb-b2f8-9c59a29e810d",
+            "telefono": "2236947115",
+            "cargo": "ADMIN",
+            "nombre": "lucas",
+            "email": "lucas@gmail.com",
+            "dni": 44145068
+        },
+        {
+            "apellido": "perez",
+            "id": "bf55f123-0069-416d-9e33-a3e1a5cdd3ba",
+            "telefono": "116947888",
+            "cargo": "ADMIN",
+            "nombre": "enzo",
+            "email": "enzo@gmail.com",
+            "dni": 45888777
+        },
+        {
+            "apellido": "FErnandez",
+            "id": "999834e3-5890-41ac-bec3-c89ed895efcc",
+            "telefono": "223999888",
+            "cargo": "RECEPCIONISTA",
+            "nombre": "Facu",
+            "email": "facu@gmail.com",
+            "dni": 38999444
+        },
+        {
+            "apellido": "Perez",
+            "id": "92a02cf9-8833-47e3-8daf-f52a5b83ba59",
+            "telefono": "223888777",
+            "cargo": "COCINA",
+            "nombre": "German",
+            "email": "ger@gmail.com",
+            "dni": 33148978
         }
     ],
-    "clientes": [{
-        "apellido": "zwicker",
-        "id": "ae8854f3-7d99-4494-88f9-f8ad3c71d07b",
-        "telefono": "2235655480",
-        "nombre": "matias",
-        "esFrecuente": false,
-        "email": "mati@gmail.com",
-        "dni": 45543410,
-        "nacionalidad": "argentina"
-    }]
+    "clientes": [
+        {
+            "apellido": "zwicker",
+            "id": "ae8854f3-7d99-4494-88f9-f8ad3c71d07b",
+            "telefono": "2235655480",
+            "nombre": "matias",
+            "esFrecuente": false,
+            "email": "mati@gmail.com",
+            "dni": 45543410,
+            "nacionalidad": "argentina"
+        },
+        {
+            "apellido": "iriarte",
+            "id": "5d296e50-fcd5-4132-9612-4b9b2251f984",
+            "telefono": "222555888",
+            "nombre": "lucas",
+            "esFrecuente": false,
+            "email": "lucs@gmail.com",
+            "dni": 44555999,
+            "nacionalidad": "Argentina"
+        },
+        {
+            "apellido": "fernandez",
+            "id": "c0f3a4c7-b566-432d-8854-43debbfb17bb",
+            "telefono": "223999844",
+            "nombre": "FACU",
+            "esFrecuente": false,
+            "email": "facu@gmail.com",
+            "dni": 44856348,
+            "nacionalidad": "Argentina"
+        }
+    ]
 }

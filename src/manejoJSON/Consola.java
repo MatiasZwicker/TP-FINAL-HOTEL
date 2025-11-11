@@ -239,7 +239,6 @@ public class Consola {
         return nuevo;
     }
 
-
     private Rol leerRol() {
         System.out.println("Cargos disponibles:");
         for (Rol r : Rol.values()) {
@@ -267,11 +266,9 @@ public class Consola {
         JSONObject personaExistente = sistema.buscarPorDNI(dni, "hotel.json");
 
         if (personaExistente != null) {
-                System.out.println("Bienvenido " + personaExistente.getString("nombre") +
-                        ", usted ya estaba registrado como " + personaExistente.getString("tipo") + ".");
+            System.out.println("Bienvenido " + personaExistente.getString("nombre") +
+                    ", usted ya estaba registrado como " + personaExistente.getString("tipo") + ".");
 
-
-            // Si ya era cliente, devolvemos el cliente encontrado
             if (personaExistente.getString("tipo").equals("cliente")) {
                 return new Cliente(
                         personaExistente.getString("telefono"),
@@ -280,21 +277,39 @@ public class Consola {
                         personaExistente.getString("apellido"),
                         personaExistente.getString("nombre"),
                         personaExistente.getString("nacionalidad"),
-                        false // no es empleado
+                        false
                 );
             } else {
-                // Si ya era empleado, no permitir registrar como cliente
-
                 System.out.println("El DNI ya está registrado como empleado. No se puede registrar como cliente.");
                 return null;
             }
-
         }
 
         // 🔹 Si el DNI no existe, procedemos al registro normal
-        String nombre = leerTexto("Nombre: ");
-        String apellido = leerTexto("Apellido: ");
-        String email = leerTexto("Email: ");
+        String nombre;
+        do {
+            nombre = leerTexto("Nombre: ");
+            if (!nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+                System.out.println("❌ El nombre solo puede contener letras. Intente nuevamente.");
+            }
+        } while (!nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+"));
+
+        String apellido;
+        do {
+            apellido = leerTexto("Apellido: ");
+            if (!apellido.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+                System.out.println("❌ El apellido solo puede contener letras. Intente nuevamente.");
+            }
+        } while (!apellido.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+"));
+
+        String email;
+        do {
+            email = leerTexto("Email: ");
+            if (!email.matches("^[\\w.+-]+@gmail\\.com$")) {
+                System.out.println("❌ El email debe ser una cuenta válida de Gmail (ejemplo: usuario@gmail.com). Intente nuevamente.");
+            }
+        } while (!email.matches("^[\\w.+-]+@gmail\\.com$"));
+
         String telefono = leerTexto("Teléfono: ");
         String nacionalidad = leerTexto("Nacionalidad: ");
 
@@ -303,6 +318,7 @@ public class Consola {
 
         return nuevoCliente;
     }
+
 
     private void mostrarClientes() {
         System.out.println("\n=== LISTADO DE CLIENTES ===");
@@ -589,7 +605,6 @@ public class Consola {
     }
 
 
-
     // ================= MOSTRAR DATOS =================
 
     private void mostrarTodo() {
@@ -758,7 +773,6 @@ public class Consola {
 
         return total;
     }
-
 
 
 }
