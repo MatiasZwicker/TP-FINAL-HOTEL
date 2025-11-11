@@ -11,7 +11,6 @@ public class ManejoJSONEmpleado {
     public static JSONObject toJSON(Empleado empleado) throws JSONException {
         JSONObject empleadoJson = new JSONObject();
 
-        // --- CORREGIDO ---
         empleadoJson.put("id", empleado.getId().toString()); // Convertir UUID a String
         empleadoJson.put("nombre", empleado.getNombre());
         empleadoJson.put("apellido", empleado.getApellido());
@@ -24,7 +23,6 @@ public class ManejoJSONEmpleado {
     }
     
     public static Empleado fromJSON(JSONObject json) throws JSONException {
-        // --- CORREGIDO ---
         UUID id = UUID.fromString(json.getString("id")); // Leer String y convertir a UUID
         String nombre = json.getString("nombre");
         String apellido = json.getString("apellido");
