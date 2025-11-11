@@ -5,6 +5,10 @@ import manejoJSON.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
+
+import java.io.FileReader;
+import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -163,7 +167,6 @@ public class Sistema {
             System.out.println("⚠️ Ya existe un empleado con el mismo DNI.");
         } else {
             empleados.add(empleado);
-            System.out.println("✅ Empleado agregado correctamente.");
         }
     }
     public void agregarCliente(Cliente cliente) {
@@ -198,7 +201,41 @@ public class Sistema {
     public Optional<Reserva> buscarReservaPorId(UUID id) {
         return this.reservas.stream().filter(r -> r.getId().equals(id)).findFirst();
     }
-    
+    /// busca por dni a ver si esta registrado
+    public JSONObject buscarPorDNI(int dni, String archivoHotel) {
+        try (FileReader reader = new FileReader(archivoHotel)) {
+            JSONObject hotel = new JSONObject(new JSONTokener(reader));
+
+            // Buscar en empleados
+            if (hotel.has("empleados")) {
+                JSONArray empleados = hotel.getJSONArray("empleados");
+                for (int i = 0; i < empleados.length(); i++) {
+                    JSONObject empleado = empleados.getJSONObject(i);
+                    if (empleado.getInt("dni") == dni) {
+                        empleado.put("tipo", "empleado");
+                        return empleado;
+                    }
+                }
+            }
+
+            // Buscar en clientes
+            if (hotel.has("clientes")) {
+                JSONArray clientes = hotel.getJSONArray("clientes");
+                for (int i = 0; i < clientes.length(); i++) {
+                    JSONObject cliente = clientes.getJSONObject(i);
+                    if (cliente.getInt("dni") == dni) {
+                        cliente.put("tipo", "cliente");
+                        return cliente;
+                    }
+                }
+            }
+
+        } catch (IOException | JSONException e) {
+            System.out.println("Error al leer el archivo " + archivoHotel);
+        }
+
+        return null;
+    }
 
     ///  busca por UUID
     public Optional<Cliente> buscarClientePorId(UUID id) {

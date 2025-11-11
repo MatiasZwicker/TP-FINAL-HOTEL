@@ -3,10 +3,14 @@ package manejoJSON;
 import Clases.*;
 import Controladores.Sistema;
 import Enums.Rol;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -24,7 +28,7 @@ public class Consola {
 
     // Método principal que se ejecuta al iniciar el programa
     public void iniciar() throws JSONException {
-        System.out.println("=== 🏨 BIENVENIDOS AL HOTEL ===");
+        System.out.println("\n=== 🏨 BIENVENIDOS AL HOTEL ===");
 
         Persona usuarioActual = null; // puede ser Cliente o Empleado
         boolean autenticado = false;
@@ -61,7 +65,7 @@ public class Consola {
                                 usuarioActual = nuevoCliente;
                                 autenticado = true;
                                 System.out.println("✅ Registro exitoso. Bienvenido " + nuevoCliente.getNombreCompleto() + "!");
-                                ManejoJSONCliente.toJSON(nuevoCliente);
+                                ManejoJSONCliente.guardar(nuevoCliente);
                             }
                         }
                         case 2 -> {
@@ -70,7 +74,7 @@ public class Consola {
                                 usuarioActual = nuevoEmpleado;
                                 autenticado = true;
                                 System.out.println("✅ Registro exitoso. Bienvenido " + nuevoEmpleado.getNombreCompleto() + "!");
-                                ManejoJSONEmpleado.toJSON(nuevoEmpleado);
+                                ManejoJSONEmpleado.guardar(nuevoEmpleado);
                             }
                         }
                         default -> System.out.println("⚠️ Opción inválida.");
@@ -108,7 +112,7 @@ public class Consola {
     }
 
     /// -------------------------MENUS---------------------------------
-    private void menuCliente(Cliente cliente) {
+    private void menuCliente(Cliente cliente) throws JSONException {
         boolean salir = false;
         while (!salir) {
             System.out.println("\n=== MENÚ CLIENTE ===");
@@ -149,21 +153,48 @@ public class Consola {
         }
     }
 
-
     // ================= EMPLEADOS =================
 
     // Método que crea y agrega un nuevo empleado
-    private Empleado agregarEmpleado() {
+    private Empleado agregarEmpleado() throws JSONException {
         System.out.println("\n--- Nuevo Empleado ---");
+
+        int dni = leerEntero("DNI: ");
+
+        // 🔹 Verificamos si el DNI ya existe en hotel.json
+        JSONObject personaExistente = sistema.buscarPorDNI(dni, "hotel.json");
+
+
+        if (personaExistente != null) {
+
+            // Si ya era un empleado, devolvemos el empleado encontrado
+            if (personaExistente.getString("tipo").equals("empleado")) {
+                // Podés reconstruir el objeto Empleado si necesitás devolverlo
+                return new Empleado(
+                        personaExistente.getString("telefono"),
+                        personaExistente.getInt("dni"),
+                        personaExistente.getString("email"),
+                        personaExistente.getString("apellido"),
+                        personaExistente.getString("nombre"),
+                        Rol.valueOf(personaExistente.getString("rol")) // o como guardes el rol
+                );
+            } else {
+                // Si era un cliente, podrías impedir crear un empleado con ese mismo DNI
+                System.out.println("El DNI ya está registrado como cliente. No se puede registrar como empleado.");
+                return null;
+            }
+        }
+
+        // 🔹 Si el DNI no existe, se sigue con el registro normal
         String nombre = leerTexto("Nombre: ");
         String apellido = leerTexto("Apellido: ");
-        int dni = leerEntero("DNI: ");
         String email = leerTexto("Email: ");
         String telefono = leerTexto("Teléfono: ");
         Rol cargo = leerRol();
 
         Empleado nuevo = new Empleado(telefono, dni, email, apellido, nombre, cargo);
         sistema.agregarEmpleado(nuevo);
+        ManejoJSONEmpleado.guardar(nuevo);
         return nuevo;
     }
 
@@ -185,25 +216,50 @@ public class Consola {
     // ================= CLIENTES =================
 
     // Método que crea y agrega un nuevo cliente
-    private Cliente agregarCliente() {
+    private Cliente agregarCliente() throws JSONException {
         System.out.println("\n--- Nuevo Cliente ---");
 
-        // Pido todos los datos básicos
+        int dni = leerEntero("DNI: ");
+
+        // 🔹 Verificamos si el DNI ya existe en hotel.json
+        JSONObject personaExistente = sistema.buscarPorDNI(dni, "hotel.json");
+
+        if (personaExistente != null) {
+                System.out.println("Bienvenido " + personaExistente.getString("nombre") +
+                        ", usted ya estaba registrado como " + personaExistente.getString("tipo") + ".");
+
+
+            // Si ya era cliente, devolvemos el cliente encontrado
+            if (personaExistente.getString("tipo").equals("cliente")) {
+                return new Cliente(
+                        personaExistente.getString("telefono"),
+                        personaExistente.getInt("dni"),
+                        personaExistente.getString("email"),
+                        personaExistente.getString("apellido"),
+                        personaExistente.getString("nombre"),
+                        personaExistente.getString("nacionalidad"),
+                        false // no es empleado
+                );
+            } else {
+                // Si ya era empleado, no permitir registrar como cliente
+
+                System.out.println("El DNI ya está registrado como empleado. No se puede registrar como cliente.");
+                return null;
+            }
+
+        }
+
+        // 🔹 Si el DNI no existe, procedemos al registro normal
         String nombre = leerTexto("Nombre: ");
         String apellido = leerTexto("Apellido: ");
-        int dni = leerEntero("DNI: ");
         String email = leerTexto("Email: ");
         String telefono = leerTexto("Teléfono: ");
         String nacionalidad = leerTexto("Nacionalidad: ");
 
-        // Creo el objeto Cliente con los datos ingresados
-        // El último "false" indica que no es empleado
         Cliente nuevoCliente = new Cliente(telefono, dni, email, apellido, nombre, nacionalidad, false);
-
-        // Lo agrego al sistema
         sistema.agregarCliente(nuevoCliente);
-        return nuevoCliente;
 
+        return nuevoCliente;
     }
 
     private void mostrarClientes() {
@@ -238,13 +294,9 @@ public class Consola {
         // Creo y agrego la habitación
         Habitacion nuevaHabitacion = new Habitacion(numero, tipo, precioXnoche);
         sistema.agregarHabitacion(nuevaHabitacion);
-        System.out.println("✅ Habitación agregada correctamente.");
 
-        try{
-            ManejoJSONHabitacion.toJSON(nuevaHabitacion);
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
+
+        ManejoJSONHabitacion.guardar(nuevaHabitacion);
     }
 
     private void mostrarHabitaciones() {
@@ -265,50 +317,29 @@ public class Consola {
 
     // ================= RESERVAS =================
 
-    private void agregarReserva(Cliente clienteActual) {
+    private void agregarReserva(Cliente clienteActual) throws JSONException {
         System.out.println("\n--- Nueva Reserva ---");
 
-        // Verifico que haya habitaciones disponibles
         if (sistema.getHabitaciones().isEmpty()) {
-            System.out.println("⚠️ No hay habitaciones disponibles para reservar.");
+            System.out.println("⚠️ No hay habitaciones cargadas en el sistema.");
             return;
         }
 
-        // Listo las habitaciones disponibles
-        System.out.println("Habitaciones disponibles:");
-        sistema.getHabitaciones().forEach(h ->
-                System.out.println("Número: " + h.getNumero() +
-                        " | Tipo: " + h.getTipo())
-        );
-
-        // Pido el número de habitación a reservar
-        int numHabitacion = leerEntero("Ingrese el número de habitación: ");
-        Optional<Habitacion> habitacionOpt = sistema.buscarHabitacionPorNumero(numHabitacion);
-
-        if (habitacionOpt.isEmpty()) {
-            System.out.println("❌ No se encontró una habitación con ese número.");
-            return;
-        }
-
-        Habitacion habitacion = habitacionOpt.get();
-
-        // Manejo de fechas
+        // --- Paso 1: Pedir fechas ---
         LocalDate desde = null;
         LocalDate hasta = null;
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        // Leo la fecha de inicio con validación
         while (true) {
             try {
                 String texto = leerTexto("Fecha inicio (YYYY-MM-DD): ");
                 desde = LocalDate.parse(texto, formato);
                 break;
             } catch (DateTimeParseException e) {
-                System.out.println("❌ Formato inválido. Ingrese la fecha como YYYY-MM-DD (ej: 2025-11-10).");
+                System.out.println("❌ Formato inválido. Ingrese la fecha como YYYY-MM-DD.");
             }
         }
 
-        // Leo la fecha de fin con validación
         while (true) {
             try {
                 String texto = leerTexto("Fecha fin (YYYY-MM-DD): ");
@@ -320,17 +351,69 @@ public class Consola {
                     break;
                 }
             } catch (DateTimeParseException e) {
-                System.out.println("❌ Formato inválido. Ingrese la fecha como YYYY-MM-DD (ej: 2025-11-15).");
+                System.out.println("❌ Formato inválido. Ingrese la fecha como YYYY-MM-DD.");
             }
         }
 
-        // Verifico disponibilidad de la habitación
-        if (!habitacion.isDisponible(desde, hasta)) {
-            System.out.println("❌ La habitación no está disponible en esas fechas.");
+        final LocalDate fechaDesde = desde;
+        final LocalDate fechaHasta = hasta;
+
+        // --- Paso 2: Filtrar habitaciones disponibles leyendo el JSON ---
+        JSONObject hotelJSON = JSONUtiles.leerObjeto("hotel.json");
+        JSONArray reservasJSON = hotelJSON.optJSONArray("reservas");
+        if (reservasJSON == null) reservasJSON = new JSONArray(); // si no hay reservas aún
+
+        JSONArray finalReservasJSON = reservasJSON;
+        List<Habitacion> disponibles = sistema.getHabitaciones().stream()
+                .filter(h -> {
+                    try {
+                        boolean haySolapamiento = false;
+                        for (int i = 0; i < finalReservasJSON.length(); i++) {
+                            JSONObject r = finalReservasJSON.getJSONObject(i);
+                            if (r.getString("habitacionId").equals(h.getId().toString()) && !r.getBoolean("cancelada")) {
+                                LocalDate rDesde = LocalDate.parse(r.getString("desde"));
+                                LocalDate rHasta = LocalDate.parse(r.getString("hasta"));
+
+                                if (!(rHasta.isBefore(fechaDesde) || rDesde.isAfter(fechaHasta))) {
+                                    haySolapamiento = true;
+                                    break;
+                                }
+                            }
+                        }
+                        return !haySolapamiento;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        return false; // si hay error, consideramos que no está disponible
+                    }
+                })
+                .toList();
+
+        if (disponibles.isEmpty()) {
+            System.out.println("⚠️ No hay habitaciones disponibles entre " + desde + " y " + hasta + ".");
             return;
         }
 
-        // Creo la reserva
+        System.out.println("\nHabitaciones disponibles entre " + desde + " y " + hasta + ":");
+        disponibles.forEach(h -> System.out.println(
+                "Número: " + h.getNumero() +
+                        " | Tipo: " + h.getTipo() +
+                        " | Precio por noche: $" + h.getPrecioxNoche()
+        ));
+
+        // --- Paso 3: Elegir habitación ---
+        int numHabitacion = leerEntero("Ingrese el número de habitación a reservar: ");
+        Optional<Habitacion> habitacionOpt = disponibles.stream()
+                .filter(h -> h.getNumero() == numHabitacion)
+                .findFirst();
+
+        if (habitacionOpt.isEmpty()) {
+            System.out.println("❌ No se encontró una habitación disponible con ese número.");
+            return;
+        }
+
+        Habitacion habitacion = habitacionOpt.get();
+
+        // --- Paso 4: Crear y guardar reserva ---
         Reserva nuevaReserva = new Reserva(
                 clienteActual.getNombreCompleto(),
                 String.valueOf(clienteActual.getDni()),
@@ -339,14 +422,17 @@ public class Consola {
                 habitacion.getId()
         );
 
+        // Guardar en el sistema y en JSON
         sistema.agregarReserva(nuevaReserva);
+        ManejoJSONReserva.guardar(nuevaReserva);
+
+        // También actualizar la habitación en JSON agregando el ID de la reserva
+        ManejoJSONHabitacion.agregarReservaIdEnJSON(habitacion, nuevaReserva.getId());
+
         System.out.println("✅ Reserva creada correctamente para " + clienteActual.getNombreCompleto());
-        try{
-            ManejoJSONReserva.toJSON(nuevaReserva);
-        }catch(Exception e){
-            System.out.println("Error");
-        }
     }
+
+
 
     private void mostrarReservas() {
         System.out.println("\n=== LISTADO DE RESERVAS ===");
@@ -438,6 +524,7 @@ public class Consola {
         }
     }
 
+    // Método genérico para leer double
     private double leerDouble() {
         while (true) {
             try {
@@ -448,5 +535,15 @@ public class Consola {
                 System.out.println("❌ Valor inválido. Ingrese un número válido (por ejemplo: 2500 o 2500.50).");
             }
         }
+    }
+
+    public boolean habitacionDisponibleEnSistema(Habitacion h, LocalDate desde, LocalDate hasta) {
+        // comprobar reservas del sistema que pertenezcan a la habitacion
+        for (Reserva r : sistema.getReservas()) {
+            if (r.getHabitacionId().equals(h.getId()) && !r.isCancelada() && r.seSolapa(desde, hasta)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

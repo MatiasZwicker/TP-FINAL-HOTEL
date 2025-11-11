@@ -1,6 +1,7 @@
 package manejoJSON;
 
 import Clases.Cliente;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.UUID; // Importar UUID
@@ -9,6 +10,7 @@ public class ManejoJSONCliente {
 
     public static JSONObject toJSON(Cliente cliente) throws JSONException {
         JSONObject clienteJson = new JSONObject();
+
 
         // --- CORREGIDO ---
         clienteJson.put("id", cliente.getId().toString()); // Convertir UUID a String
@@ -21,7 +23,23 @@ public class ManejoJSONCliente {
         clienteJson.put("esFrecuente", cliente.isEsFrecuente());
 
         return clienteJson;
+
     }
+    public static void guardar(Cliente c) {
+        try {
+            JSONObject hotel = JSONUtiles.leerObjeto("hotel.json");
+            JSONArray clientes = hotel.optJSONArray("clientes");
+            if (clientes == null) clientes = new JSONArray();
+
+            clientes.put(toJSON(c));
+            hotel.put("clientes", clientes);
+
+            JSONUtiles.grabarObjeto(hotel, "hotel.json");
+        } catch (Exception e) {
+            System.out.println("❌ Error al guardar cliente: " + e.getMessage());
+        }
+    }
+
 
     public static Cliente fromJSON(JSONObject json) throws JSONException {
         // --- CORREGIDO ---

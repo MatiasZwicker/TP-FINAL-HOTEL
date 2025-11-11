@@ -1,67 +1,96 @@
 {
-    "habitaciones": [{
-        "tipo": "Simple",
-        "numero": 20,
-      "Precio por noche": 200,
-        "reservasIds": [
-            "fcc5fde6-95b2-4bbd-8810-cdf5b471265b",
-            "1107c068-3d76-4deb-9e85-af63820aef5c"
-        ],
-        "id": "5da92695-363e-4aec-be57-983073c09c31",
-        "disponible": true
-    }],
+    "habitaciones": [
+        {
+            "tipo": "suite",
+            "numero": 325,
+            "precio por noche": 900,
+            "reservasIds": [],
+            "id": "7fdd548a-8dcd-4c1b-b0be-264fbcc2bb22",
+            "disponible": true
+        },
+        {
+            "tipo": "doble",
+            "numero": 315,
+            "precio por noche": 700,
+            "reservasIds": [],
+            "id": "46de8050-4c6f-407c-9f01-a1cb25ef2a7f",
+            "disponible": true
+        },
+        {
+            "tipo": "simple",
+            "numero": 128,
+            "precio por noche": 500,
+            "reservasIds": [],
+            "id": "11cf0e4b-4162-4eb4-aa68-d461b37cf2f0",
+            "disponible": true
+        }
+    ],
     "reservas": [
         {
-            "hasta": "2025-06-20",
+            "hasta": "2025-12-11",
             "cancelada": false,
-            "desde": "2025-06-17",
-            "nombreReservante": "Pablo Fernandez",
-            "documento": "32970479",
-            "id": "fcc5fde6-95b2-4bbd-8810-cdf5b471265b",
-            "habitacionId": "5da92695-363e-4aec-be57-983073c09c31"
-        },
-        {
-            "hasta": "2025-04-08",
-            "cancelada": false,
-            "desde": "2025-06-07",
-            "nombreReservante": "MATIAS ZWICKER",
+            "desde": "2025-11-11",
+            "nombreReservante": "matias zwicker",
             "documento": "45543410",
-            "id": "1107c068-3d76-4deb-9e85-af63820aef5c",
-            "habitacionId": "5da92695-363e-4aec-be57-983073c09c31"
-        }
-    ],
-    "empleados": [],
-    "clientes": [
-        {
-            "apellido": "Fernandez",
-            "id": "563fa251-ee84-48e5-b80f-3dae3c1d79d3",
-            "telefono": "2262569390",
-            "nombre": "Pablo",
-            "esFrecuente": false,
-            "email": "facu@mail.com",
-            "dni": 32970479,
-            "nacionalidad": "Argentina"
+            "id": "03ed4c23-c9a6-496d-aad0-7e22dd2eca87",
+            "habitacionId": "46de8050-4c6f-407c-9f01-a1cb25ef2a7f"
         },
         {
-            "apellido": "ZWICKER",
-            "id": "90a4d552-68c8-4e26-843f-7043044b5af2",
-            "telefono": "2235655480",
-            "nombre": "MATIAS",
-            "esFrecuente": false,
-            "email": "MATIZWICKER@GMAIL.COM",
-            "dni": 45543410,
-            "nacionalidad": "ARGENTINA"
+            "hasta": "2026-01-01",
+            "cancelada": false,
+            "desde": "2025-11-15",
+            "nombreReservante": "matias zwicker",
+            "documento": "45543410",
+            "id": "36f80212-7348-405f-9358-168f1859f41c",
+            "habitacionId": "46de8050-4c6f-407c-9f01-a1cb25ef2a7f"
         },
         {
-            "apellido": "Iriarte",
-            "id": "9528dfaa-3be1-4590-bb2b-0ba59d1cd115",
-            "telefono": "2236667111",
-            "nombre": "Lucas",
-            "esFrecuente": false,
-            "email": "lucas@gmail.com",
-            "dni": 44111888,
-            "nacionalidad": "Argentino"
+            "hasta": "2025-12-12",
+            "cancelada": false,
+            "desde": "2025-11-11",
+            "nombreReservante": "matias zwicker",
+            "documento": "45543410",
+            "id": "ceb8007c-5177-41f2-8457-d444f3e444aa",
+            "habitacionId": "46de8050-4c6f-407c-9f01-a1cb25ef2a7f"
+        },
+        {
+            "hasta": "2025-12-12",
+            "cancelada": false,
+            "desde": "2025-11-11",
+            "nombreReservante": "matias zwicker",
+            "documento": "45543410",
+            "id": "85ac1391-5eeb-45be-8a9e-9701b43f32bb",
+            "habitacionId": "46de8050-4c6f-407c-9f01-a1cb25ef2a7f"
         }
     ],
-    "usuarios": []
+    "empleados": [
+        {
+            "apellido": "zwicker",
+            "id": "dfc71bc5-4cbc-4e2f-9910-e2c5822c1793",
+            "telefono": "223566580",
+            "cargo": "ADMIN",
+            "nombre": "manuel",
+            "email": "manuel@gmail.com",
+            "dni": 45543411
+        },
+        {
+            "apellido": "zwicker",
+            "id": "dfc71bc5-4cbc-4e2f-9910-e2c5822c1793",
+            "telefono": "223566580",
+            "cargo": "ADMIN",
+            "nombre": "manuel",
+            "email": "manuel@gmail.com",
+            "dni": 45543411
+        }
+    ],
+    "clientes": [{
+        "apellido": "zwicker",
+        "id": "ae8854f3-7d99-4494-88f9-f8ad3c71d07b",
+        "telefono": "2235655480",
+        "nombre": "matias",
+        "esFrecuente": false,
+        "email": "mati@gmail.com",
+        "dni": 45543410,
+        "nacionalidad": "argentina"
+    }]
 }

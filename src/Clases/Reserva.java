@@ -24,9 +24,10 @@ public class Reserva {
         this.cancelada = false;
     }
 
-    public boolean seSolapa(LocalDate dDesde, LocalDate dHasta) {
-        // solapan si no (uno termina antes que empiece el otro)
-        return !(this.hasta.isBefore(dDesde) || this.desde.isAfter(dHasta));
+    public boolean seSolapa(LocalDate desdeNuevo, LocalDate hastaNuevo) {
+        // true si hay intersección entre [this.desde, this.hasta] y [desdeNuevo, hastaNuevo]
+        // no se solapa si this.hasta < desdeNuevo OR this.desde > hastaNuevo
+        return !(this.getHasta().isBefore(desdeNuevo) || this.getDesde().isAfter(hastaNuevo));
     }
 
     // getters/setters...

@@ -18,19 +18,17 @@ public class Habitacion implements Reservable {
     private List<Reserva> reservas = new ArrayList<>();
 
 
-
     public Habitacion() {
         this.id = UUID.randomUUID();
         this.disponible = true;
     }
 
-    public Habitacion(int numero, String tipo,  double precioxNoche) {
+    public Habitacion(int numero, String tipo, double precioxNoche) {
         this();
         this.numero = numero;
         this.tipo = tipo;
         this.precioxNoche = precioxNoche;
     }
-
 
 
     // getters/setters...
@@ -79,16 +77,26 @@ public class Habitacion implements Reservable {
         this.reservas = reservas;
     }
 
-    public void agregarReserva(Reserva r) { reservas.add(r); }
-    public List<Reserva> getReservas() { return reservas; }
+    public void agregarReserva(Reserva r) {
+        reservas.add(r);
+    }
+
+    public List<Reserva> getReservas() {
+        return reservas;
+    }
 
 
     @Override
     public boolean isDisponible(LocalDate desde, LocalDate hasta) {
-        if (!disponible) return false;
-        for (Reserva r : reservas) {
-            if (r.seSolapa(desde, hasta)) return false;
+        // 1) si la habitacion tiene lista de reservas cargada
+        if (this.getReservas() != null && !this.getReservas().isEmpty()) {
+            for (Reserva r : this.getReservas()) {
+                if (!r.isCancelada() && r.seSolapa(desde, hasta)) {
+                    return false;
+                }
+            }
+            return true;
         }
-        return true;
+        return true; // si no hay reservas cargadas, asumimos disponible — comprobar desde el sistema al filtrar
     }
 }

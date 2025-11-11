@@ -1,6 +1,7 @@
 package manejoJSON;
 
 import Clases.Reserva;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -9,6 +10,7 @@ import java.util.UUID;
 
 public class ManejoJSONReserva {
 
+    private static final String ARCHIVO_HOTEL = "hotel.json";
     public static JSONObject toJSON(Reserva r) throws JSONException {
         JSONObject reservaJson = new JSONObject();
         reservaJson.put("id", r.getId().toString());
@@ -23,6 +25,22 @@ public class ManejoJSONReserva {
 
         return reservaJson;
     }
+    public static void guardar(Reserva r) {
+        try {
+            JSONObject hotel = JSONUtiles.leerObjeto("hotel.json");
+            JSONArray reservas = hotel.optJSONArray("reservas");
+            if (reservas == null) reservas = new JSONArray();
+
+            reservas.put(toJSON(r));
+            hotel.put("reservas", reservas);
+
+            JSONUtiles.grabarObjeto(hotel, "hotel.json");
+
+        } catch (Exception e) {
+            System.out.println("❌ Error al guardar reserva: " + e.getMessage());
+        }
+    }
+
 
     public static Reserva fromJSON(JSONObject json) throws JSONException {
         String idString = json.getString("id");

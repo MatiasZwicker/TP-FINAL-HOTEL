@@ -2,6 +2,7 @@ package manejoJSON;
 
 import Clases.Empleado;
 import Enums.Rol;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.UUID; // Importar UUID
@@ -20,8 +21,25 @@ public class ManejoJSONEmpleado {
         empleadoJson.put("cargo", empleado.getCargo());
 
         return empleadoJson;
+
     }
-    
+    public static void guardar(Empleado e) {
+        try {
+            JSONObject hotel = JSONUtiles.leerObjeto("hotel.json");
+            JSONArray empleados = hotel.optJSONArray("empleados");
+            if (empleados == null) empleados = new JSONArray();
+
+            empleados.put(toJSON(e));
+            hotel.put("empleados", empleados);
+
+            JSONUtiles.grabarObjeto(hotel, "hotel.json");
+
+        } catch (Exception ex) {
+            System.out.println("❌ Error al guardar empleado: " + ex.getMessage());
+        }
+    }
+
+
     public static Empleado fromJSON(JSONObject json) throws JSONException {
         UUID id = UUID.fromString(json.getString("id")); // Leer String y convertir a UUID
         String nombre = json.getString("nombre");
