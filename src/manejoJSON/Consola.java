@@ -151,6 +151,7 @@ public class Consola {
                     System.out.println("2 - Ver listado de habitaciones");
                     System.out.println("3 - Ver listado de reservas");
                     System.out.println("4 - Ver listado de clientes");
+                    System.out.println("5 - Eliminar habitacion");
                     System.out.println("0 - Salir");
 
                     int opcion = leerEntero("Opción: ");
@@ -159,6 +160,7 @@ public class Consola {
                         case 2 -> mostrarHabitaciones();
                         case 3 -> mostrarReservas();
                         case 4 -> mostrarClientes();
+                        case 5 -> eliminarHabitacion();
                         case 0 -> salir = true;
                         default -> System.out.println("⚠️ Opción inválida.");
                     }
@@ -357,21 +359,30 @@ public class Consola {
         ManejoJSONHabitacion.guardar(nuevaHabitacion);
     }
 
-    private void mostrarHabitaciones() {
-        System.out.println("\n=== LISTADO DE HABITACIONES ===");
+    private void mostrarHabitaciones() throws JSONException {
+        JSONObject hotelData = sistema.leerArchivoHotel("hotel.json");
 
-        if (sistema.getHabitaciones().isEmpty()) {
-            System.out.println("(sin habitaciones registradas)");
+        if (hotelData == null || !hotelData.has("habitaciones")) {
+            System.out.println("⚠️ No hay habitaciones registradas.");
             return;
         }
 
-        for (Habitacion h : sistema.getHabitaciones()) {
-            System.out.println("Número: " + h.getNumero() +
-                    " | Tipo: " + h.getTipo() +
-                    " | Estado: " + (h.isDisponible() ? "Disponible ✅" : "Ocupada ❌") +
-                    " | Precio por noche: " + h.getPrecioxNoche());
+        JSONArray habitaciones = hotelData.getJSONArray("habitaciones");
+
+        System.out.println("\n=== LISTADO DE HABITACIONES ===");
+        for (int i = 0; i < habitaciones.length(); i++) {
+            JSONObject hab = habitaciones.getJSONObject(i);
+
+            int numero = hab.getInt("numero");
+            String tipo = hab.getString("tipo");
+            double precio = hab.getDouble("precio por noche");
+            boolean disponible = hab.getBoolean("disponible");
+
+            String estado = disponible ? "Disponible ✅" : "Ocupada ❌";
+            System.out.println("Número: " + numero + " | Tipo: " + tipo + " | Estado: " + estado + " | Precio por noche: " + precio);
         }
     }
+
 
     // ================= RESERVAS =================
 
@@ -682,6 +693,7 @@ public class Consola {
             }
         }
     }
+
     public boolean habitacionDisponibleEnSistema(Habitacion h, LocalDate desde, LocalDate hasta) {
         // comprobar reservas del sistema que pertenezcan a la habitacion
         for (Reserva r : sistema.getReservas()) {
@@ -723,7 +735,7 @@ public class Consola {
         ItemCocina item;
         switch (tipo.toLowerCase()) {
             case "entrada" -> item = new Entrada(nombre, precio);
-            case "principal" -> item = new PlatoPrincipal(nombre,precio);
+            case "principal" -> item = new PlatoPrincipal(nombre, precio);
             case "postre" -> item = new Postre(nombre, precio);
             case "bebida" -> item = new BebidaArtesanal(nombre, precio);
             case "desayuno" -> item = new Desayuno(nombre, precio);
@@ -774,5 +786,41 @@ public class Consola {
         return total;
     }
 
+    private void eliminarHabitacion() throws JSONException {
+        System.out.println("\n--- Eliminar Habitación ---");
+
+        // Mostrar listado actual
+        mostrarHabitaciones();
+
+        int numero = leerEntero("Ingrese el número de habitación a eliminar: ");
+
+        // Leer el JSON principal del hotel
+        JSONObject hotelData = sistema.leerArchivoHotel("hotel.json"); // método que lee el archivo principal
+
+        if (hotelData == null || !hotelData.has("habitaciones")) {
+            System.out.println("⚠️ No se encontraron habitaciones en hotel.json.");
+            return;
+        }
+
+        JSONArray habitaciones = hotelData.getJSONArray("habitaciones");
+        boolean encontrada = false;
+
+        for (int i = 0; i < habitaciones.length(); i++) {
+            JSONObject hab = habitaciones.getJSONObject(i);
+            if (hab.getInt("numero") == numero) {
+                habitaciones.remove(i);
+                encontrada = true;
+                break;
+            }
+        }
+
+        if (encontrada) {
+            hotelData.put("habitaciones", habitaciones);
+            sistema.guardarArchivoHotel(hotelData, "hotel.json");
+            System.out.println("✅ Habitación número " + numero + " eliminada correctamente.");
+        } else {
+            System.out.println("❌ No se encontró una habitación con el número " + numero + ".");
+        }
+    }
 
 }

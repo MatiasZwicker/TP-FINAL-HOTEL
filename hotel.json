@@ -31,26 +31,6 @@
             ],
             "id": "11cf0e4b-4162-4eb4-aa68-d461b37cf2f0",
             "disponible": true
-        },
-        {
-            "tipo": "simple",
-            "numero": 950,
-            "precio por noche": 150,
-            "reservasIds": [
-                "bc74cd65-dabe-4efe-8a70-3ac2f6bb910b",
-                "08e002b4-1619-473c-9bcd-4545665ac5d7",
-                "c7c4d5c3-7e18-474a-9a56-be0b010103e7"
-            ],
-            "id": "1e300228-d33f-4079-9649-fd97417eb0ab",
-            "disponible": true
-        },
-        {
-            "tipo": "simple",
-            "numero": 15,
-            "precio por noche": 500,
-            "reservasIds": [],
-            "id": "40c2376b-004d-442a-936e-686487b4dc6e",
-            "disponible": true
         }
     ],
     "reservas": [
@@ -208,6 +188,15 @@
             "nombre": "German",
             "email": "ger@gmail.com",
             "dni": 33148978
+        },
+        {
+            "apellido": "suarez",
+            "id": "838c7942-a30e-449d-8db5-ec65f2fce26f",
+            "telefono": "2236615",
+            "cargo": "ADMIN",
+            "nombre": "tobias",
+            "email": "tobi@gmail.com",
+            "dni": 455434
         }
     ],
     "clientes": [

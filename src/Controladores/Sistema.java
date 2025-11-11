@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import java.util.ArrayList;
@@ -258,4 +259,28 @@ public class Sistema {
                 .filter(h -> h.getNumero() == numero)
                 .findFirst();
     }
+    // Leer archivo hotel.json (con objetos: clientes, empleados, habitaciones, etc.)
+    public JSONObject leerArchivoHotel(String ruta) throws JSONException {
+        try (FileReader reader = new FileReader(ruta)) {
+            JSONTokener tokener = new JSONTokener(reader);
+            return new JSONObject(tokener);
+        } catch (IOException e) {
+            System.out.println("⚠️ Error al leer el archivo " + ruta);
+            return null;
+        }
+    }
+
+    // Guardar archivo hotel.json actualizado
+    public void guardarArchivoHotel(JSONObject data, String ruta) throws JSONException {
+        try (FileWriter writer = new FileWriter(ruta, false)) { // 👈 false = sobrescribe
+            writer.write(data.toString(4)); // 4 = indentación para legibilidad
+            writer.flush();
+        } catch (IOException e) {
+            System.out.println("⚠️ Error al guardar el archivo " + ruta);
+            e.printStackTrace();
+        }
+    }
+
+
+
 }
