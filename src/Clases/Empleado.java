@@ -1,27 +1,29 @@
 package Clases;
 
+import Enums.Rol;
+
 public class Empleado extends Persona {
-    private String cargo;
+    private Rol cargo;
 
     public Empleado() {
         super();
     }
 
-    public Empleado(String cargo) {
+    public Empleado(Rol cargo) {
         super();
         this.cargo = cargo;
     }
 
-    public Empleado(String telefono, int dni, String email, String apellido, String nombre, String cargo) {
+    public Empleado(String telefono, int dni, String email, String apellido, String nombre, Rol cargo) {
         super(telefono, dni, email, apellido, nombre);
         this.cargo = cargo;
     }
 
-    public String getCargo() {
+    public Rol getCargo() {
         return cargo;
     }
 
-    public void setCargo(String cargo) {
+    public void setCargo(Rol cargo) {
         this.cargo = cargo;
     }
     @Override

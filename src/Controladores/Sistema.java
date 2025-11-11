@@ -120,7 +120,20 @@ public class Sistema {
         JSONUtiles.grabarObjeto(data, ARCHIVO_DATOS);
         System.out.println("💾 Sistema guardado correctamente en " + ARCHIVO_DATOS);
     }
+    public void agregarEmpleado(Empleado empleado) {
+        if (empleado == null) return;
 
+        // Evitamos duplicados por DNI
+        boolean existe = empleados.stream()
+                .anyMatch(e -> e.getDni() == empleado.getDni());
+
+        if (existe) {
+            System.out.println("⚠️ Ya existe un empleado con el mismo DNI.");
+        } else {
+            empleados.add(empleado);
+            System.out.println("✅ Empleado agregado correctamente.");
+        }
+    }
     public void agregarCliente(Cliente cliente) {
         this.clientes.add(cliente);
     }
@@ -164,6 +177,10 @@ public class Sistema {
         return clientes.stream()
                 .filter(c -> c.getDni() == dni)
                 .findFirst();
+    }
+    /// busca empleado por dni
+    public Optional<Empleado> buscarEmpleadoPorDni(int dni) {
+        return empleados.stream().filter(e -> e.getDni() == dni).findFirst();
     }
 
     ///  busca habitacion por numero

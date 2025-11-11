@@ -29,10 +29,11 @@ public class ManejoJSONHabitacion {
         String idString = habitacionJson.getString("id");
         int numero  = habitacionJson.getInt("numero");
         String tipo = habitacionJson.getString("tipo");
+        double precio = habitacionJson.getDouble("Precio por noche");
         boolean disponible = habitacionJson.getBoolean("disponible");
 
         // creamos el Objeto habitacion usando el constructor
-        Habitacion h = new Habitacion(numero, tipo);
+        Habitacion h = new Habitacion(numero, tipo, precio);
 
         // asigamos los valores restantes usando los setters
         h.setId(UUID.fromString(idString));

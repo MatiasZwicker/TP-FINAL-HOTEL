@@ -1,6 +1,7 @@
 package manejoJSON;
 
 import Clases.Empleado;
+import Enums.Rol;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.UUID; // Importar UUID
@@ -30,7 +31,7 @@ public class ManejoJSONEmpleado {
         String email = json.getString("email");
         int dni = json.getInt("dni");
         String telefono = json.getString("telefono");
-        String cargo = json.getString("cargo");
+        Rol cargo = Rol.valueOf(json.getString("cargo"));
 
         Empleado empleado = new Empleado(
                 telefono,

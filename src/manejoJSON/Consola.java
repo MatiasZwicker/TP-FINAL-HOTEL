@@ -9,7 +9,6 @@ import java.time.format.DateTimeParseException;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Scanner;
-import java.util.UUID;
 
 public class Consola {
 
@@ -25,41 +24,168 @@ public class Consola {
 
     // Método principal que se ejecuta al iniciar el programa
     public void iniciar() throws JSONException {
-        System.out.println("=== SISTEMA DE HOTEL (Consola) ===");
+        System.out.println("=== 🏨 BIENVENIDOS AL HOTEL ===");
 
-        boolean salir = false;
-        // Bucle principal del menú
-        while (!salir) {
-            mostrarMenu();
-            int opcion = leerEntero("Opción: "); // leo la opción del usuario
+        Persona usuarioActual = null; // puede ser Cliente o Empleado
+        boolean autenticado = false;
+
+        while (!autenticado) {
+            System.out.println("\n¿Usted ya está registrado?");
+            System.out.println("1 - Sí, iniciar sesión");
+            System.out.println("2 - No, registrarme");
+            System.out.println("0 - Salir");
+
+            int opcion = leerEntero("Opción: ");
+
             switch (opcion) {
-                case 1 -> agregarCliente();      // agrega un nuevo cliente
-                case 2 -> agregarHabitacion();   // agrega una habitación
-                case 3 -> agregarReserva();      // crea una reserva
-                case 4 -> mostrarTodo();         // muestra todos los datos
-                case 0 -> {                      // guarda y termina el programa
-                    sistema.guardarSistema();
-                    System.out.println("👋 Fin del programa.");
-                    salir = true;
+                case 1 -> { // LOGIN
+                    usuarioActual = loginUsuario();
+                    if (usuarioActual != null) {
+                        System.out.println("✅ Bienvenido, " + usuarioActual.getNombreCompleto() + "!");
+                        autenticado = true;
+                    } else {
+                        System.out.println("❌ DNI no encontrado. Intente nuevamente.");
+                    }
                 }
+
+                case 2 -> { // REGISTRO
+                    System.out.println("\n¿Desea registrarse como?");
+                    System.out.println("1 - Cliente");
+                    System.out.println("2 - Empleado");
+
+                    int tipo = leerEntero("Opción: ");
+                    switch (tipo) {
+                        case 1 -> {
+                            Cliente nuevoCliente = agregarCliente();
+                            if (nuevoCliente != null) {
+                                usuarioActual = nuevoCliente;
+                                autenticado = true;
+                                System.out.println("✅ Registro exitoso. Bienvenido " + nuevoCliente.getNombreCompleto() + "!");
+                                ManejoJSONCliente.toJSON(nuevoCliente);
+                            }
+                        }
+                        case 2 -> {
+                            Empleado nuevoEmpleado = agregarEmpleado();
+                            if (nuevoEmpleado != null) {
+                                usuarioActual = nuevoEmpleado;
+                                autenticado = true;
+                                System.out.println("✅ Registro exitoso. Bienvenido " + nuevoEmpleado.getNombreCompleto() + "!");
+                                ManejoJSONEmpleado.toJSON(nuevoEmpleado);
+                            }
+                        }
+                        default -> System.out.println("⚠️ Opción inválida.");
+                    }
+                }
+
+                case 0 -> {
+                    System.out.println("👋 Gracias por visitar el hotel. ¡Hasta luego!");
+                    return;
+                }
+
+                default -> System.out.println("⚠️ Opción inválida.");
+            }
+        }
+
+        // --- MENÚ SEGÚN TIPO DE USUARIO ---
+        if (usuarioActual instanceof Empleado empleado) {
+            menuEmpleado(empleado);
+        } else if (usuarioActual instanceof Cliente cliente) {
+            menuCliente(cliente);
+        }
+    }
+
+    ///  funcion para logearse
+    private Persona loginUsuario() {
+        int dni = leerEntero("Ingrese su DNI: ");
+
+        // Buscar primero si es empleado
+        Optional<Empleado> empleadoOpt = sistema.buscarEmpleadoPorDni(dni);
+        if (empleadoOpt.isPresent()) return empleadoOpt.get();
+
+        // Si no, buscar si es cliente
+        Optional<Cliente> clienteOpt = sistema.buscarClientePorDni(dni);
+        return clienteOpt.orElse(null);
+    }
+
+    /// -------------------------MENUS---------------------------------
+    private void menuCliente(Cliente cliente) {
+        boolean salir = false;
+        while (!salir) {
+            System.out.println("\n=== MENÚ CLIENTE ===");
+            System.out.println("1 - Ver habitaciones disponibles");
+            System.out.println("2 - Realizar una reserva");
+            System.out.println("0 - Salir");
+
+            int opcion = leerEntero("Opción: ");
+
+            switch (opcion) {
+                case 1 -> mostrarHabitaciones();
+                case 2 -> agregarReserva(cliente);
+                case 0 -> salir = true;
                 default -> System.out.println("⚠️ Opción inválida.");
             }
         }
     }
 
-    // Muestra el menú principal
-    private void mostrarMenu() {
-        System.out.println("\n1) Agregar Cliente");
-        System.out.println("2) Agregar Habitación");
-        System.out.println("3) Agregar Reserva");
-        System.out.println("4) Mostrar Todo");
-        System.out.println("0) Salir y Guardar");
+    private void menuEmpleado(Empleado empleado) {
+        boolean salir = false;
+        while (!salir) {
+            System.out.println("\n=== MENÚ EMPLEADO ===");
+            System.out.println("1 - Agregar habitación");
+            System.out.println("2 - Ver listado de reservas");
+            System.out.println("3 - Ver listado de clientes");
+            System.out.println("0 - Salir");
+
+            int opcion = leerEntero("Opción: ");
+
+            switch (opcion) {
+                case 1 -> agregarHabitacion();
+
+                case 2 -> mostrarReservas();
+                case 3 -> mostrarClientes();
+                case 0 -> salir = true;
+                default -> System.out.println("⚠️ Opción inválida.");
+            }
+        }
     }
 
+
+    // ================= EMPLEADOS =================
+
+    // Método que crea y agrega un nuevo empleado
+    private Empleado agregarEmpleado() {
+        System.out.println("\n--- Nuevo Empleado ---");
+        String nombre = leerTexto("Nombre: ");
+        String apellido = leerTexto("Apellido: ");
+        int dni = leerEntero("DNI: ");
+        String email = leerTexto("Email: ");
+        String telefono = leerTexto("Teléfono: ");
+        Rol cargo = leerRol();
+
+        Empleado nuevo = new Empleado(telefono, dni, email, apellido, nombre, cargo);
+        sistema.agregarEmpleado(nuevo);
+        return nuevo;
+    }
+
+    private Rol leerRol() {
+        System.out.println("Cargos disponibles:");
+        for (Rol r : Rol.values()) {
+            System.out.println("- " + r.name());
+        }
+
+        while (true) {
+            String texto = leerTexto("Ingrese el cargo (ADMIN, COCINA, RECEPCIONISTA, LIMPIEZA): ").toUpperCase();
+            try {
+                return Rol.valueOf(texto);
+            } catch (IllegalArgumentException e) {
+                System.out.println("⚠️ Cargo inválido. Intente nuevamente.");
+            }
+        }
+    }
     // ================= CLIENTES =================
 
     // Método que crea y agrega un nuevo cliente
-    private void agregarCliente() {
+    private Cliente agregarCliente() {
         System.out.println("\n--- Nuevo Cliente ---");
 
         // Pido todos los datos básicos
@@ -76,7 +202,26 @@ public class Consola {
 
         // Lo agrego al sistema
         sistema.agregarCliente(nuevoCliente);
-        System.out.println("✅ Cliente agregado correctamente.");
+        return nuevoCliente;
+
+    }
+
+    private void mostrarClientes() {
+        System.out.println("\n=== LISTADO DE CLIENTES ===");
+
+        if (sistema.getClientes().isEmpty()) {
+            System.out.println("(sin clientes registrados)");
+            return;
+        }
+
+        for (Cliente c : sistema.getClientes()) {
+            System.out.println(
+                    "👤 " + c.getNombreCompleto() +
+                            " | DNI: " + c.getDni() +
+                            " | Email: " + c.getEmail() +
+                            " | Nacionalidad: " + c.getNacionalidad()
+            );
+        }
     }
 
     // ================= HABITACIONES =================
@@ -88,72 +233,78 @@ public class Consola {
         // Pido los datos básicos de la habitación
         int numero = leerEntero("Número de Habitación: ");
         String tipo = leerTexto("Tipo (SIMPLE/DOBLE/SUITE): ");
+        double precioXnoche = leerDouble();
 
         // Creo y agrego la habitación
-        Habitacion nuevaHabitacion = new Habitacion(numero, tipo);
+        Habitacion nuevaHabitacion = new Habitacion(numero, tipo, precioXnoche);
         sistema.agregarHabitacion(nuevaHabitacion);
         System.out.println("✅ Habitación agregada correctamente.");
+
+        try{
+            ManejoJSONHabitacion.toJSON(nuevaHabitacion);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void mostrarHabitaciones() {
+        System.out.println("\n=== LISTADO DE HABITACIONES ===");
+
+        if (sistema.getHabitaciones().isEmpty()) {
+            System.out.println("(sin habitaciones registradas)");
+            return;
+        }
+
+        for (Habitacion h : sistema.getHabitaciones()) {
+            System.out.println("Número: " + h.getNumero() +
+                    " | Tipo: " + h.getTipo() +
+                    " | Estado: " + (h.isDisponible() ? "Disponible ✅" : "Ocupada ❌") +
+                    " | Precio por noche: " + h.getPrecioxNoche());
+        }
     }
 
     // ================= RESERVAS =================
 
-    private void agregarReserva() {
+    private void agregarReserva(Cliente clienteActual) {
         System.out.println("\n--- Nueva Reserva ---");
 
-        // Antes de crear una reserva, verifico que haya al menos un cliente y una habitación
-        if (sistema.getClientes().isEmpty() || sistema.getHabitaciones().isEmpty()) {
-            System.out.println("⚠️ Necesitás al menos un cliente y una habitación para crear una reserva.");
+        // Verifico que haya habitaciones disponibles
+        if (sistema.getHabitaciones().isEmpty()) {
+            System.out.println("⚠️ No hay habitaciones disponibles para reservar.");
             return;
         }
 
-        // Listo todos los clientes existentes
-        System.out.println("Clientes disponibles:");
-        sistema.getClientes().forEach(c ->
-                System.out.println("- DNI: " + c.getDni() + " | " + c.getNombreCompleto())
-        );
-
-        // Pido el DNI del cliente que va a hacer la reserva
-        int dni = leerEntero("Ingrese el DNI del cliente: ");
-
-        // Busco el cliente con ese DNI usando Optional (para evitar null)
-        //Optional es una clase generica de Java que sirve para evitar el null
-        Optional<Cliente> clienteOpt = sistema.buscarClientePorDni(dni);
-        if (clienteOpt.isEmpty()) {
-            System.out.println("❌ No se encontró un cliente con ese DNI.");
-            return;
-        }
-        Cliente cliente = clienteOpt.get();
-
-        // Listo todas las habitaciones para que el usuario elija
+        // Listo las habitaciones disponibles
         System.out.println("Habitaciones disponibles:");
         sistema.getHabitaciones().forEach(h ->
-                System.out.println("Tipo de habitacion " + h.getTipo() + " | Numero " + h.getNumero())
+                System.out.println("Número: " + h.getNumero() +
+                        " | Tipo: " + h.getTipo())
         );
 
-        // Pido el número de habitación que se desea reservar
-        int numHabitacion = leerEntero("Ingrese el numero de habitacion: ");
-
-        // Busco la habitación seleccionada
+        // Pido el número de habitación a reservar
+        int numHabitacion = leerEntero("Ingrese el número de habitación: ");
         Optional<Habitacion> habitacionOpt = sistema.buscarHabitacionPorNumero(numHabitacion);
+
         if (habitacionOpt.isEmpty()) {
             System.out.println("❌ No se encontró una habitación con ese número.");
             return;
         }
+
         Habitacion habitacion = habitacionOpt.get();
 
-        // --- Manejo de fechas ---
+        // Manejo de fechas
         LocalDate desde = null;
         LocalDate hasta = null;
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // formato de fecha
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         // Leo la fecha de inicio con validación
         while (true) {
             try {
                 String texto = leerTexto("Fecha inicio (YYYY-MM-DD): ");
                 desde = LocalDate.parse(texto, formato);
-                break; // si es válida, salgo del bucle
+                break;
             } catch (DateTimeParseException e) {
-                System.out.println("❌ Formato inválido. Ingrese la fecha con formato YYYY-MM-DD (por ejemplo, 2025-11-10).");
+                System.out.println("❌ Formato inválido. Ingrese la fecha como YYYY-MM-DD (ej: 2025-11-10).");
             }
         }
 
@@ -163,28 +314,63 @@ public class Consola {
                 String texto = leerTexto("Fecha fin (YYYY-MM-DD): ");
                 hasta = LocalDate.parse(texto, formato);
 
-                // Validación: la fecha de fin no puede ser anterior a la de inicio
                 if (hasta.isBefore(desde)) {
                     System.out.println("❌ La fecha de fin no puede ser anterior a la de inicio.");
                 } else {
                     break;
                 }
             } catch (DateTimeParseException e) {
-                System.out.println("❌ Formato inválido. Ingrese la fecha con formato YYYY-MM-DD (por ejemplo, 2025-11-15).");
+                System.out.println("❌ Formato inválido. Ingrese la fecha como YYYY-MM-DD (ej: 2025-11-15).");
             }
         }
 
-        // Creo la nueva reserva y la agrego al sistema
+        // Verifico disponibilidad de la habitación
+        if (!habitacion.isDisponible(desde, hasta)) {
+            System.out.println("❌ La habitación no está disponible en esas fechas.");
+            return;
+        }
+
+        // Creo la reserva
         Reserva nuevaReserva = new Reserva(
-                cliente.getNombreCompleto(),
-                String.valueOf(cliente.getDni()),
+                clienteActual.getNombreCompleto(),
+                String.valueOf(clienteActual.getDni()),
                 desde,
                 hasta,
                 habitacion.getId()
         );
 
         sistema.agregarReserva(nuevaReserva);
-        System.out.println("✅ Reserva creada correctamente.");
+        System.out.println("✅ Reserva creada correctamente para " + clienteActual.getNombreCompleto());
+        try{
+            ManejoJSONReserva.toJSON(nuevaReserva);
+        }catch(Exception e){
+            System.out.println("Error");
+        }
+    }
+
+    private void mostrarReservas() {
+        System.out.println("\n=== LISTADO DE RESERVAS ===");
+
+        if (sistema.getReservas().isEmpty()) {
+            System.out.println("(sin reservas registradas)");
+            return;
+        }
+
+        for (Reserva r : sistema.getReservas()) {
+            // Buscar el cliente y la habitación asociados a la reserva
+            Cliente cliente = sistema.buscarClientePorDni(Integer.parseInt(r.getDocumento())).orElse(null);
+            Habitacion habitacion = sistema.buscarHabitacionPorId(r.getHabitacionId()).orElse(null);
+
+            String nombreCliente = (cliente != null) ? cliente.getNombreCompleto() : "Desconocido";
+            String numHabitacion = (habitacion != null) ? String.valueOf(habitacion.getNumero()) : "N/A";
+
+            System.out.println(
+                    "🛎️ Reserva de: " + nombreCliente +
+                            " | Habitación: " + numHabitacion +
+                            " | Desde: " + r.getDesde() +
+                            " | Hasta: " + r.getHasta()
+            );
+        }
     }
 
     // ================= MOSTRAR DATOS =================
@@ -248,6 +434,18 @@ public class Consola {
                 return Integer.parseInt(sc.nextLine().trim());
             } catch (NumberFormatException e) {
                 System.out.println("⚠️ Ingrese un número válido.");
+            }
+        }
+    }
+
+    private double leerDouble() {
+        while (true) {
+            try {
+                System.out.print("Precio por noche: $");
+                String texto = sc.nextLine().trim().replace(",", "."); // permite usar coma o punto
+                return Double.parseDouble(texto);
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Valor inválido. Ingrese un número válido (por ejemplo: 2500 o 2500.50).");
             }
         }
     }

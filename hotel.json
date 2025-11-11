@@ -2,6 +2,7 @@
     "habitaciones": [{
         "tipo": "Simple",
         "numero": 20,
+      "Precio por noche": 200,
         "reservasIds": [
             "fcc5fde6-95b2-4bbd-8810-cdf5b471265b",
             "1107c068-3d76-4deb-9e85-af63820aef5c"
