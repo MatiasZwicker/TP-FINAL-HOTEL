@@ -12,6 +12,7 @@ public class Reserva {
     private UUID habitacionId;
     private boolean cancelada;
     private Pago pago;
+    private Factura factura;
 
     public Reserva() { this.id = UUID.randomUUID(); }
 
@@ -36,6 +37,14 @@ public class Reserva {
 
     public Pago getPago() {
         return pago;
+    }
+
+    public Factura getFactura() {
+        return factura;
+    }
+
+    public void setFactura(Factura factura) {
+        this.factura = factura;
     }
 
     public void setPago(Pago pago) {

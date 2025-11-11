@@ -1,6 +1,8 @@
 package Clases;
 
+
 import Enums.EstadoFactura;
+import Enums.TipoFactura;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -11,17 +13,35 @@ public class Factura {
     private LocalDateTime fechaEmision;
     private Money total;
     private EstadoFactura estado;
+    private TipoFactura tipo;
 
-    public Factura() { this.id = UUID.randomUUID(); this.estado = EstadoFactura.BORRADOR; }
+    public Factura() {
+        this.id = UUID.randomUUID();
+        this.estado = EstadoFactura.BORRADOR;
+    }
+
+    public Factura(Money total, TipoFactura tipo) {
+        this();
+        this.total = total;
+        this.tipo = tipo;
+        this.numero = generarNumeroFactura();
+    }
+
+    private String generarNumeroFactura() {
+        int aleatorio = (int) (Math.random() * 100000);
+        return "FA-" + aleatorio;
+    }
 
     public void emitir() {
         this.estado = EstadoFactura.EMITIDA;
         this.fechaEmision = LocalDateTime.now();
+
     }
 
-    public void anular() {
-        this.estado = EstadoFactura.ANULADA;
-    }
+    public void anular() { this.estado = EstadoFactura.ANULADA; }
+
+    // Getters y setters...
+
 
     public UUID getId() {
         return id;
@@ -31,12 +51,12 @@ public class Factura {
         this.id = id;
     }
 
-    public Money getTotal() {
-        return total;
+    public TipoFactura getTipo() {
+        return tipo;
     }
 
-    public void setTotal(Money total) {
-        this.total = total;
+    public void setTipo(TipoFactura tipo) {
+        this.tipo = tipo;
     }
 
     public EstadoFactura getEstado() {
@@ -45,6 +65,14 @@ public class Factura {
 
     public void setEstado(EstadoFactura estado) {
         this.estado = estado;
+    }
+
+    public Money getTotal() {
+        return total;
+    }
+
+    public void setTotal(Money total) {
+        this.total = total;
     }
 
     public LocalDateTime getFechaEmision() {
@@ -63,3 +91,4 @@ public class Factura {
         this.numero = numero;
     }
 }
+

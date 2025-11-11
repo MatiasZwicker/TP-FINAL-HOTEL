@@ -5,11 +5,14 @@ import Clases.Cocina.*;
 import Controladores.Sistema;
 import Enums.MetodoPago;
 import Enums.Rol;
+import Enums.TipoFactura;
 import Interfaz.ItemCocina;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
+import java.security.PublicKey;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.LocalDate;
@@ -508,18 +511,22 @@ public class Consola {
         System.out.println("Desde: " + reserva.getDesde());
         System.out.println("Hasta: " + reserva.getHasta());
 
+        // 🕒 Calcular cantidad de noches
         long noches = ChronoUnit.DAYS.between(reserva.getDesde(), reserva.getHasta());
+        System.out.println("Cantidad de noches: " + noches);
+
+        // 💰 Calcular precio total
         double precioPorNoche = sistema.buscarHabitacionPorId(reserva.getHabitacionId()).get().getPrecioxNoche();
         double total = noches * precioPorNoche;
 
+        System.out.println("Precio por noche: $" + precioPorNoche);
+        System.out.println("Total a pagar: $" + total);
 
-        double monto1 = calcularMontoReserva(reserva);
-        System.out.println("Total a pagar: " + monto1);
-
+        // --- Selección del método de pago ---
         System.out.println("\nSeleccione método de pago:");
         System.out.println("1 - Efectivo");
-        System.out.println("2 - Tarjeta Credito");
-        System.out.println("3 - Tarjeta Debito");
+        System.out.println("2 - Tarjeta Crédito");
+        System.out.println("3 - Tarjeta Débito");
         System.out.println("4 - Transferencia");
 
         int opcion = leerEntero("Opción: ");
@@ -528,7 +535,7 @@ public class Consola {
         switch (opcion) {
             case 1 -> metodo = MetodoPago.EFECTIVO;
             case 2 -> metodo = MetodoPago.TARJETA_CREDITO;
-            case 3->  metodo = MetodoPago.TARJETA_DEBITO;
+            case 3 -> metodo = MetodoPago.TARJETA_DEBITO;
             case 4 -> metodo = MetodoPago.TRANSFERENCIA;
             default -> {
                 System.out.println("❌ Método inválido. Reserva no confirmada.");
@@ -536,13 +543,52 @@ public class Consola {
             }
         }
 
+        // ✅ Crear el objeto Money a partir del total
+        Money montoMoney = new Money(BigDecimal.valueOf(total), "ARS");
 
-        Pago pago = new Pago(monto1, metodo, "SIM-" + UUID.randomUUID());
-        reserva.setPago(pago); // si tu clase Reserva tiene un campo Pago
-        System.out.println("✅ Pago registrado: " + monto1 + " vía " + metodo);
+        // ✅ Crear el pago con el objeto Money
+        Pago pago = new Pago(montoMoney, metodo, "SIM-" + UUID.randomUUID());
+        reserva.setPago(pago);
+
+        System.out.println("✅ Pago registrado: " + total + " ARS vía " + metodo);
+
+        // --- Seleccionar tipo de factura ---
+        System.out.println("\nSeleccione tipo de factura:");
+        System.out.println("1 - Factura A");
+        System.out.println("2 - Factura B");
+        System.out.println("3 - Factura C");
+
+        int opcionFactura = leerEntero("Opción: ");
+        TipoFactura tipoFactura;
+
+        switch (opcionFactura) {
+            case 1 -> tipoFactura = TipoFactura.A;
+            case 2 -> tipoFactura = TipoFactura.B;
+            case 3 -> tipoFactura = TipoFactura.C;
+            default -> {
+                System.out.println("❌ Tipo de factura inválido. Se canceló la emisión.");
+                return false;
+            }
+        }
+
+        // ✅ Crear y emitir la factura
+        Factura factura = new Factura();
+        factura.setTotal(montoMoney);
+        factura.setNumero("FAC-" + UUID.randomUUID().toString().substring(0, 8));
+        factura.setTipo(tipoFactura); // si tu clase Factura tiene campo tipoFactura
+        factura.emitir();
+
+        reserva.setFactura(factura);
+
+        System.out.println("🧾 Factura tipo " + tipoFactura + " emitida correctamente.");
+        System.out.println("Número: " + factura.getNumero());
+        System.out.println("Fecha emisión: " + factura.getFechaEmision());
+        System.out.println("Monto total facturado: $" + total + " (" + noches + " noches)");
 
         return true;
     }
+
+
 
     // ================= MOSTRAR DATOS =================
 

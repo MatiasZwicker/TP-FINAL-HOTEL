@@ -16,15 +16,18 @@ public class ManejoJSONFactura {
         facturaJson.put("numero", factura.getNumero());
         facturaJson.put("estado", factura.getEstado().name());
 
-        // Guardamos fechas y objetos complejos
+// Guardamos fechas y objetos complejos
         if (factura.getFechaEmision() != null) {
             facturaJson.put("fechaEmision", factura.getFechaEmision().toString());
         }
+
+// ✅ Guardamos el total solo si existe
         if (factura.getTotal() != null) {
             facturaJson.put("total", ManejoJSONMoney.toJSON(factura.getTotal()));
         }
 
         return facturaJson;
+
     }
 
     public static Factura fromJSON(JSONObject facJson) throws JSONException {

@@ -4,7 +4,7 @@
             "tipo": "suite",
             "numero": 325,
             "precio por noche": 900,
-            "reservasIds": [],
+            "reservasIds": ["cfdb25d0-e0b8-4287-b41a-a6ea033b4f24"],
             "id": "7fdd548a-8dcd-4c1b-b0be-264fbcc2bb22",
             "disponible": true
         },
@@ -12,7 +12,7 @@
             "tipo": "doble",
             "numero": 315,
             "precio por noche": 700,
-            "reservasIds": [],
+            "reservasIds": ["94d21b51-0e3c-44bf-b2bd-75d8ea4c6992"],
             "id": "46de8050-4c6f-407c-9f01-a1cb25ef2a7f",
             "disponible": true
         },
@@ -32,7 +32,10 @@
             "tipo": "simple",
             "numero": 950,
             "precio por noche": 150,
-            "reservasIds": ["bc74cd65-dabe-4efe-8a70-3ac2f6bb910b"],
+            "reservasIds": [
+                "bc74cd65-dabe-4efe-8a70-3ac2f6bb910b",
+                "08e002b4-1619-473c-9bcd-4545665ac5d7"
+            ],
             "id": "1e300228-d33f-4079-9649-fd97417eb0ab",
             "disponible": true
         }
@@ -109,6 +112,33 @@
             "documento": "45543410",
             "id": "76c34fca-51e0-4039-9714-1fb84e251edc",
             "habitacionId": "11cf0e4b-4162-4eb4-aa68-d461b37cf2f0"
+        },
+        {
+            "hasta": "2025-06-05",
+            "cancelada": false,
+            "desde": "2025-02-05",
+            "nombreReservante": "matias zwicker",
+            "documento": "45543410",
+            "id": "08e002b4-1619-473c-9bcd-4545665ac5d7",
+            "habitacionId": "1e300228-d33f-4079-9649-fd97417eb0ab"
+        },
+        {
+            "hasta": "2025-06-06",
+            "cancelada": false,
+            "desde": "2025-05-06",
+            "nombreReservante": "matias zwicker",
+            "documento": "45543410",
+            "id": "94d21b51-0e3c-44bf-b2bd-75d8ea4c6992",
+            "habitacionId": "46de8050-4c6f-407c-9f01-a1cb25ef2a7f"
+        },
+        {
+            "hasta": "2026-05-05",
+            "cancelada": false,
+            "desde": "2025-09-08",
+            "nombreReservante": "matias zwicker",
+            "documento": "45543410",
+            "id": "cfdb25d0-e0b8-4287-b41a-a6ea033b4f24",
+            "habitacionId": "7fdd548a-8dcd-4c1b-b0be-264fbcc2bb22"
         }
     ],
     "empleados": [
