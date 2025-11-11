@@ -23,6 +23,14 @@
             "reservasIds": [],
             "id": "11cf0e4b-4162-4eb4-aa68-d461b37cf2f0",
             "disponible": true
+        },
+        {
+            "tipo": "simple",
+            "numero": 950,
+            "precio por noche": 150,
+            "reservasIds": [],
+            "id": "1e300228-d33f-4079-9649-fd97417eb0ab",
+            "disponible": true
         }
     ],
     "reservas": [
@@ -81,6 +89,24 @@
             "nombre": "manuel",
             "email": "manuel@gmail.com",
             "dni": 45543411
+        },
+        {
+            "apellido": "perez",
+            "id": "fcfcf5ab-e735-4c86-abe0-7266ce46b15b",
+            "telefono": "24515187",
+            "cargo": "COCINA",
+            "nombre": "juan",
+            "email": "juan@gmail.com",
+            "dni": 455414
+        },
+        {
+            "apellido": "perez",
+            "id": "93f47e1d-34f4-43c2-a48c-78e3d5537d1a",
+            "telefono": "24515187",
+            "cargo": "COCINA",
+            "nombre": "juan",
+            "email": "juan@gmail.com",
+            "dni": 455414
         }
     ],
     "clientes": [{

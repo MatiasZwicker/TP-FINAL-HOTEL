@@ -1,8 +1,10 @@
 package manejoJSON;
 
 import Clases.*;
+import Clases.Cocina.*;
 import Controladores.Sistema;
 import Enums.Rol;
+import Interfaz.ItemCocina;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,6 +12,7 @@ import org.json.JSONObject;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -74,7 +77,7 @@ public class Consola {
                                 usuarioActual = nuevoEmpleado;
                                 autenticado = true;
                                 System.out.println("✅ Registro exitoso. Bienvenido " + nuevoEmpleado.getNombreCompleto() + "!");
-                                ManejoJSONEmpleado.guardar(nuevoEmpleado);
+
                             }
                         }
                         default -> System.out.println("⚠️ Opción inválida.");
@@ -118,6 +121,7 @@ public class Consola {
             System.out.println("\n=== MENÚ CLIENTE ===");
             System.out.println("1 - Ver habitaciones disponibles");
             System.out.println("2 - Realizar una reserva");
+            System.out.println("3 - Ver menu de platos");
             System.out.println("0 - Salir");
 
             int opcion = leerEntero("Opción: ");
@@ -125,33 +129,69 @@ public class Consola {
             switch (opcion) {
                 case 1 -> mostrarHabitaciones();
                 case 2 -> agregarReserva(cliente);
+                case 3 -> mostrarMenuCocina();
                 case 0 -> salir = true;
                 default -> System.out.println("⚠️ Opción inválida.");
             }
         }
     }
 
-    private void menuEmpleado(Empleado empleado) {
+    private void menuEmpleado(Empleado empleado) throws JSONException {
         boolean salir = false;
+
         while (!salir) {
             System.out.println("\n=== MENÚ EMPLEADO ===");
-            System.out.println("1 - Agregar habitación");
-            System.out.println("2 - Ver listado de reservas");
-            System.out.println("3 - Ver listado de clientes");
-            System.out.println("0 - Salir");
+            System.out.println("Cargo: " + empleado.getCargo());
 
-            int opcion = leerEntero("Opción: ");
+            switch (empleado.getCargo().toString().toUpperCase().trim()) {
+                case "ADMIN" -> {
+                    System.out.println("1 - Agregar habitación");
+                    System.out.println("2 - Ver listado de habitaciones");
+                    System.out.println("3 - Ver listado de reservas");
+                    System.out.println("4 - Ver listado de clientes");
+                    System.out.println("0 - Salir");
 
-            switch (opcion) {
-                case 1 -> agregarHabitacion();
+                    int opcion = leerEntero("Opción: ");
+                    switch (opcion) {
+                        case 1 -> agregarHabitacion();
+                        case 2 -> mostrarHabitaciones();
+                        case 3 -> mostrarReservas();
+                        case 4 -> mostrarClientes();
+                        case 0 -> salir = true;
+                        default -> System.out.println("⚠️ Opción inválida.");
+                    }
+                }
 
-                case 2 -> mostrarReservas();
-                case 3 -> mostrarClientes();
-                case 0 -> salir = true;
-                default -> System.out.println("⚠️ Opción inválida.");
+                case "RECEPCIONISTA" -> {
+                    System.out.println("1 - Ver listado de habitaciones");
+                    System.out.println("2 - Ver listado de reservas");
+                    System.out.println("3 - Ver listado de clientes");
+                    System.out.println("0 - Salir");
+
+                    int opcion = leerEntero("Opción: ");
+                    switch (opcion) {
+                        case 1 -> mostrarHabitaciones();
+                        case 2 -> mostrarReservas();
+                        case 3 -> mostrarClientes();
+                        case 0 -> salir = true;
+                        default -> System.out.println("⚠️ Opción inválida.");
+                    }
+                }
+
+                case "COCINA" -> {
+                    System.out.println("Bienvenido al menú de cocina, " + empleado.getNombreCompleto() + "!");
+                    menuCocina();  // Llama directamente al menú de cocina
+                    salir = true;   // Salir del menuEmpleado después de terminar
+                }
+
+                default -> {
+                    System.out.println("⚠️ Cargo no reconocido.");
+                    salir = true;
+                }
             }
         }
     }
+
 
     // ================= EMPLEADOS =================
 
@@ -164,28 +204,24 @@ public class Consola {
         // 🔹 Verificamos si el DNI ya existe en hotel.json
         JSONObject personaExistente = sistema.buscarPorDNI(dni, "hotel.json");
 
-
         if (personaExistente != null) {
-
-            // Si ya era un empleado, devolvemos el empleado encontrado
             if (personaExistente.getString("tipo").equals("empleado")) {
-                // Podés reconstruir el objeto Empleado si necesitás devolverlo
+                System.out.println("Empleado con este DNI ya registrado. Se inicia sesión automáticamente.");
                 return new Empleado(
                         personaExistente.getString("telefono"),
                         personaExistente.getInt("dni"),
                         personaExistente.getString("email"),
                         personaExistente.getString("apellido"),
                         personaExistente.getString("nombre"),
-                        Rol.valueOf(personaExistente.getString("rol")) // o como guardes el rol
+                        Rol.valueOf(personaExistente.getString("cargo"))
                 );
             } else {
-                // Si era un cliente, podrías impedir crear un empleado con ese mismo DNI
                 System.out.println("El DNI ya está registrado como cliente. No se puede registrar como empleado.");
-                return null;
+                return null;  // ❌ NO crear un nuevo empleado
             }
         }
 
-        // 🔹 Si el DNI no existe, se sigue con el registro normal
+        // 🔹 DNI no existe, se sigue con el registro
         String nombre = leerTexto("Nombre: ");
         String apellido = leerTexto("Apellido: ");
         String email = leerTexto("Email: ");
@@ -193,10 +229,14 @@ public class Consola {
         Rol cargo = leerRol();
 
         Empleado nuevo = new Empleado(telefono, dni, email, apellido, nombre, cargo);
+
+        // Solo agregamos si es realmente nuevo
         sistema.agregarEmpleado(nuevo);
         ManejoJSONEmpleado.guardar(nuevo);
+
         return nuevo;
     }
+
 
     private Rol leerRol() {
         System.out.println("Cargos disponibles:");
@@ -289,7 +329,7 @@ public class Consola {
         // Pido los datos básicos de la habitación
         int numero = leerEntero("Número de Habitación: ");
         String tipo = leerTexto("Tipo (SIMPLE/DOBLE/SUITE): ");
-        double precioXnoche = leerDouble();
+        double precioXnoche = leerDouble("Precio por noche: $");
 
         // Creo y agrego la habitación
         Habitacion nuevaHabitacion = new Habitacion(numero, tipo, precioXnoche);
@@ -432,8 +472,6 @@ public class Consola {
         System.out.println("✅ Reserva creada correctamente para " + clienteActual.getNombreCompleto());
     }
 
-
-
     private void mostrarReservas() {
         System.out.println("\n=== LISTADO DE RESERVAS ===");
 
@@ -525,18 +563,17 @@ public class Consola {
     }
 
     // Método genérico para leer double
-    private double leerDouble() {
+    private double leerDouble(String mensaje) {
         while (true) {
             try {
-                System.out.print("Precio por noche: $");
-                String texto = sc.nextLine().trim().replace(",", "."); // permite usar coma o punto
+                System.out.print(mensaje);
+                String texto = sc.nextLine().trim().replace(",", ".");
                 return Double.parseDouble(texto);
             } catch (NumberFormatException e) {
                 System.out.println("❌ Valor inválido. Ingrese un número válido (por ejemplo: 2500 o 2500.50).");
             }
         }
     }
-
     public boolean habitacionDisponibleEnSistema(Habitacion h, LocalDate desde, LocalDate hasta) {
         // comprobar reservas del sistema que pertenezcan a la habitacion
         for (Reserva r : sistema.getReservas()) {
@@ -546,4 +583,69 @@ public class Consola {
         }
         return true;
     }
+
+    private final GestorCocina<ItemCocina> gestorCocina = new GestorCocina<ItemCocina>();
+
+    private void menuCocina() throws JSONException {
+        boolean salir = false;
+
+        while (!salir) {
+            System.out.println("\n=== MENÚ DE COCINA ===");
+            System.out.println("1 - Agregar plato o bebida");
+            System.out.println("2 - Ver menú completo");
+            System.out.println("0 - Volver");
+
+            int opcion = leerEntero("Opción: ");
+
+            switch (opcion) {
+                case 1 -> agregarItemCocina();
+                case 2 -> mostrarMenuCocina();
+                case 0 -> salir = true;
+                default -> System.out.println("⚠️ Opción inválida.");
+            }
+        }
+    }
+
+    private void agregarItemCocina() throws JSONException {
+        String nombre = leerTexto("Nombre: ");
+        String tipo = leerTexto("Tipo (Entrada, Principal, Postre, Bebida, Desayuno, Merienda): ");
+        double precio = leerDouble("Precio: $");
+
+
+        ItemCocina item;
+        switch (tipo.toLowerCase()) {
+            case "entrada" -> item = new Entrada(nombre, precio);
+            case "principal" -> item = new PlatoPrincipal(nombre,precio);
+            case "postre" -> item = new Postre(nombre, precio);
+            case "bebida" -> item = new BebidaArtesanal(nombre, precio);
+            case "desayuno" -> item = new Desayuno(nombre, precio);
+            case "merienda" -> item = new Merienda(nombre, precio);
+            default -> {
+                System.out.println("Tipo inválido, se agrega como PlatoPrincipal por defecto.");
+                item = new PlatoPrincipal(nombre, precio);
+            }
+        }
+        ManejoJSONPlatos.guardar(item);
+
+        gestorCocina.agregar(item);
+        System.out.println("✅ " + nombre + " agregado al menú de cocina.");
+    }
+
+    private void mostrarMenuCocina() throws JSONException {
+        System.out.println("\n--- Menú completo ---");
+
+        // Leemos los platos guardados en JSON
+        List<ItemCocina> menu = ManejoJSONPlatos.leerTodos();
+
+        if (menu.isEmpty()) {
+            System.out.println("No hay platos ni bebidas cargados.");
+            return;
+        }
+
+        menu.forEach(p -> System.out.println("🍽️ | " + p.getNombre() + " - $" + p.getPrecio()));
+    }
+
+
+
+
 }

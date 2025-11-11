@@ -1,0 +1,22 @@
+[
+    {
+        "precio": 400,
+        "tipo": "PlatoPrincipal",
+        "nombre": "fideos"
+    },
+    {
+        "precio": 15,
+        "tipo": "BebidaArtesanal",
+        "nombre": "Coca"
+    },
+    {
+        "precio": 600,
+        "tipo": "PlatoPrincipal",
+        "nombre": "milanesas"
+    },
+    {
+        "precio": 250,
+        "tipo": "Postre",
+        "nombre": "Flan"
+    }
+]
